@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order - Restaurant Ordering App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #f093fb 100%);
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(168, 237, 234, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(254, 214, 227, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.8) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar:hover {
+            background: rgba(0, 0, 0, 0.9) !important;
+        }
+
+        .order-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-form h2 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #a8edea;
+            box-shadow: 0 0 0 0.2rem rgba(168, 237, 234, 0.25);
+        }
+
+        .menu-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .menu-item:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .quantity-input {
+            width: 80px;
+            border-radius: 10px;
+            border: 2px solid #ced4da;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            border-color: #a8edea;
+            box-shadow: 0 0 0 0.2rem rgba(168, 237, 234, 0.25);
+            outline: none;
+        }
+
+        .cart-item {
+            background: #e9ecef;
+            border-radius: 15px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        #totalPrice {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #28a745;
+        }
+
+        button[type="submit"] {
+            border-radius: 30px;
+            padding: 12px 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(40,167,69,0.3);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(40,167,69,0.5);
+        }
+
+        @media (max-width: 768px) {
+            .order-form {
+                padding: 2rem 1.5rem;
+            }
+
+            .order-form h2 {
+                font-size: 2rem;
+            }
+
+            .quantity-input {
+                width: 60px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html"><i class="fas fa-utensils"></i> RestoYerr</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="menu.html"><i class="fas fa-list"></i> Menu</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="order.html"><i class="fas fa-shopping-cart"></i> Order</a></li>
+                    <li class="nav-item"><a class="nav-link" href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="order-form">
+                    <h2 class="text-center mb-4"><i class="fas fa-shopping-cart"></i> Place Your Order</h2>
+                    
+                    <form id="orderForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="customerName" class="form-label">Customer Name *</label>
+                                    <input type="text" class="form-control" id="customerName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tableNumber" class="form-label">Table Number *</label>
+                                    <input type="number" class="form-control" id="tableNumber" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4 mb-3">Select Menu Items</h4>
+                        <div id="menuList">
+                            <!-- Menu items will be loaded here -->
+                        </div>
+
+                        <div id="cartSection" class="mt-4" style="display: none;">
+                            <h4>Your Order</h4>
+                            <div id="cartItems"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Total: <span id="totalPrice" class="text-success">Rp 0</span></h5>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-check"></i> Place Order
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let cart = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselectedMenu = urlParams.get('menu');
+
+        function loadMenus() {
+            const menus = getMenus();
+            const menuList = document.getElementById('menuList');
+            
+            if (menus.length === 0) {
+                menuList.innerHTML = '<div class="alert alert-warning">No menu items available. Please add some menus first.</div>';
+                return;
+            }
+            
+            menus.forEach(menu => {
+                const menuItem = `
+                    <div class="menu-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h5>${menu.name}</h5>
+                                <p class="text-muted mb-1">${menu.category}</p>
+                                <p class="mb-0">${menu.description || 'No description'}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="h5 text-success mb-0">Rp ${menu.price.toLocaleString()}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity('${menu.id}', -1)">-</button>
+                                    <input type="number" class="form-control quantity-input text-center" id="qty-${menu.id}" value="0" min="0" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="changeQuantity('${menu.id}', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                menuList.innerHTML += menuItem;
+            });
+            
+            if (preselectedMenu) {
+                changeQuantity(preselectedMenu, 1);
+            }
+        }
+
+        function changeQuantity(menuId, delta) {
+            const qtyInput = document.getElementById(`qty-${menuId}`);
+            let qty = parseInt(qtyInput.value) + delta;
+            if (qty < 0) qty = 0;
+            qtyInput.value = qty;
+            updateCart();
+        }
+
+        function updateCart() {
+            cart = [];
+            const menus = getMenus();
+            let total = 0;
+            
+            menus.forEach(menu => {
+                const qty = parseInt(document.getElementById(`qty-${menu.id}`).value);
+                if (qty > 0) {
+                    const itemTotal = menu.price * qty;
+                    cart.push({
+                        menuId: menu.id,
+                        name: menu.name,
+                        price: menu.price,
+                        quantity: qty,
+                        total: itemTotal
+                    });
+                    total += itemTotal;
+                }
+            });
+            
+            const cartSection = document.getElementById('cartSection');
+            const cartItems = document.getElementById('cartItems');
+            
+            if (cart.length > 0) {
+                cartSection.style.display = 'block';
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item d-flex justify-content-between align-items-center">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>Rp ${item.total.toLocaleString()}</span>
+                    </div>
+                `).join('');
+                document.getElementById('totalPrice').textContent = `Rp ${total.toLocaleString()}`;
+            } else {
+                cartSection.style.display = 'none';
+            }
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                alert('Please select at least one menu item.');
+                return;
+            }
+            
+            const orderData = {
+                id: Date.now().toString(),
+                customerName: document.getElementById('customerName').value,
+                tableNumber: parseInt(document.getElementById('tableNumber').value),
+                items: cart,
+                total: cart.reduce((sum, item) => sum + item.total, 0),
+                timestamp: new Date().toISOString()
+            };
+            
+            saveOrder(orderData);
+            alert('Order placed successfully!');
+            window.location.href = 'orders.html';
+        });
+
+        // Load menus on page load
+        loadMenus();
+    </script>
+</body>
+</html>
